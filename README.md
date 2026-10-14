@@ -487,6 +487,7 @@ sse:
   sse_path: "/sse"                 # SSE endpoint path
   message_path: "/messages/"       # Message submission path
   health_path: "/health"           # Health check path
+  max_request_body_size: null      # Optional: max POST body in bytes (default: no limit)
 
 # HTTP-specific settings (when type: "streamable-http")
 streamable-http:
@@ -495,6 +496,9 @@ streamable-http:
   mcp_path: "/mcp"                 # MCP endpoint path
   json_response: true              # Enable JSON responses
   stateless: true                  # Stateless mode
+  max_request_body_size: null      # Optional: max request body in bytes (default: no limit)
+  session_idle_timeout: null       # Optional: close stateful sessions idle for N seconds (default: never)
+  max_sessions: null               # Optional: max concurrent stateful sessions (default: no limit)
 
 # ============================================
 # LOGGING CONFIGURATION
