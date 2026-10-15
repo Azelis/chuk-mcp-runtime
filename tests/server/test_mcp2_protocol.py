@@ -32,7 +32,11 @@ from chuk_mcp_runtime.server.request_context import (
     send_progress,
 )
 from chuk_mcp_runtime.session.native_session_management import get_user_or_none
-from chuk_mcp_runtime.types import SSEConfig, StreamableHTTPConfig
+from chuk_mcp_runtime.types import (
+    DEFAULT_MAX_REQUEST_BODY_SIZE,
+    SSEConfig,
+    StreamableHTTPConfig,
+)
 
 # Client modes and the protocol each negotiates with this server
 PROTOCOLS = {"legacy": "2025-11-25", "auto": "2026-07-28"}
@@ -229,13 +233,16 @@ async def test_request_identity_is_set_for_each_sse_post():
     assert get_user_or_none() is None  # reset after the request
 
 
-def test_transport_limits_default_to_mcp1_behaviour():
+def test_transport_limit_defaults():
+    # A finite body limit, larger than mcp 2's 4 MiB; no idle timeout or session cap
     http_cfg = StreamableHTTPConfig()
-    assert http_cfg.max_request_body_size is None
+    assert http_cfg.max_request_body_size == DEFAULT_MAX_REQUEST_BODY_SIZE == 50 * 1024 * 1024
     assert http_cfg.session_idle_timeout is None
     assert http_cfg.max_sessions is None
-    assert SSEConfig().max_request_body_size is None
+    assert SSEConfig().max_request_body_size == DEFAULT_MAX_REQUEST_BODY_SIZE
 
+    # An explicit null disables the limit
+    assert StreamableHTTPConfig(max_request_body_size=None).max_request_body_size is None
     assert srv_mod._body_limit(None) == sys.maxsize
     assert srv_mod._body_limit(1024) == 1024
 

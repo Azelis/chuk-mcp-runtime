@@ -194,7 +194,7 @@ def _with_request_identity(app: ASGIApp) -> ASGIApp:
 
 
 def _body_limit(configured: Optional[int]) -> int:
-    """mcp 2 requires a positive request body limit; None keeps mcp 1.x behaviour (no limit)."""
+    """mcp 2 requires a positive request body limit; a configured None means no limit."""
     return configured if configured is not None else sys.maxsize
 
 
@@ -998,7 +998,8 @@ class MCPServer:
                 event_store=event_store,
                 stateless=stateless,
                 json_response=json_response,
-                # mcp 2 defaults are 4 MiB / 30 min / 10,000; None keeps mcp 1.x behaviour
+                # Body limit defaults to 50 MiB (mcp 2: 4 MiB); idle timeout and session cap
+                # default to None (mcp 1.x behaviour) instead of mcp 2's 30 min / 10,000
                 max_request_body_size=_body_limit(http_cfg.max_request_body_size),
                 session_idle_timeout=http_cfg.session_idle_timeout,
                 max_sessions=http_cfg.max_sessions,
